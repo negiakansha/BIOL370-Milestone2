@@ -44,6 +44,7 @@ def AlignSequences(proteinSeqs):
                 highestMatchIndex2 = j
                 tempSimilarity = similarity  # Store highest similarity so far in tempSimilarity
 
+    print("matches are at indices: ")
     print([highestMatchIndex1, highestMatchIndex2])
     print("num matches: " + str(tempSimilarity))
 
@@ -55,13 +56,14 @@ def AlignSequences(proteinSeqs):
     alignmentPlaced = False
     for i in range(len(proteinSeqs)):
         if not alignmentPlaced and (i == highestMatchIndex1 or i == highestMatchIndex2):
-            newProteinSeqs.append("replace here") # GloballyAlign(highestMatchIndex1, highestMatchIndex2)
+            #REPLACE HERE WITH GLOBALLY ALIGNED OR ALIGNED STRING
+            newProteinSeqs.append(proteinSeqs[i]) # GloballyAlign(highestMatchIndex1, highestMatchIndex2)
             alignmentPlaced = True
         elif i != highestMatchIndex1 and i != highestMatchIndex2:
             newProteinSeqs.append(proteinSeqs[i])
 
     print(newProteinSeqs)
-    print(len(newProteinSeqs))
+    print("Length of sequences: " + str(len(newProteinSeqs)))
     proteinSeqs = newProteinSeqs
 
     return newProteinSeqs
@@ -96,12 +98,11 @@ def main():
     
     print("Here are the protein sequences given: ")
     print(proteinSeqs)
-    print(len(proteinSeqs))
+    print("Length of sequences: " + str(len(proteinSeqs)))
 
     #re-iterate the steps until all sequences have been included in a single multiple alignment. 
-    # while len(proteinSeqs) > 1:
-    proteinSeqs = AlignSequences(proteinSeqs)
-    AlignSequences(proteinSeqs)
+    while len(proteinSeqs) > 1:
+        proteinSeqs = AlignSequences(proteinSeqs)
 
 #run main function
 main()
