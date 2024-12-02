@@ -7,11 +7,21 @@ This python3 program is designed to recursively globally align a set
 of protein sequences into one alignment.
 '''
 
-#Make sure there are at least two protein sequences in protein sequence input
-def ValidateProteins(proteinSeqs):
-    if len(proteinSeqs) > 1:
-        return True
-    return False
+#Make sure protein sequences have valid characters
+def ValidateProteins(proteinSeqs, nameOfSeqs, substitutionMatrix):
+    validSeqs = substitutionMatrix.keys()
+    
+    # make sure only seqs in proteinSeqs are the seqs that exist
+    for i, seq in enumerate(proteinSeqs):
+        if any(sequences not in validSeqs for sequences in seq):
+            if nameOfSeqs:
+                print(f"The sequence " + str(nameOfSeqs[i]) + " is not valid. Please try again.")
+                return False
+            else:
+                print(f"The sequence " + str(proteinSeqs[i]) + " is not valid. Please try again.")
+                return False
+    return True
+
 
 #This is our team's substitution matrix we are using to determine alignment for protein sequences
 substitutionMatrix = {
@@ -165,14 +175,8 @@ def AlignSequences(proteinSeqs):
                 highestMatchIndex2 = j
                 tempSimilarity = similarity  # Store highest similarity so far in tempSimilarity
 
-    print("matches are at indices: ")
-    print([highestMatchIndex1, highestMatchIndex2])
-    print("num matches: " + str(tempSimilarity))
-
     # globally align those two sequences using your team’s substitution matrix
     aligned1, aligned2 = GloballyAlign(protein1, protein2)
-    print("Align sequences: ")
-    print(aligned1, "\n", aligned2)
     finalAligned = AlignTwoSequencesIntoOne(aligned1, aligned2)
 
     # Replace the two protein sequences with their alignment in the original set of sequences
@@ -185,9 +189,6 @@ def AlignSequences(proteinSeqs):
             alignmentPlaced = True
         elif i != highestMatchIndex1 and i != highestMatchIndex2:
             newProteinSeqs.append(proteinSeqs[i])
-
-    print(newProteinSeqs)
-    print("Length of sequences: " + str(len(newProteinSeqs)))
     proteinSeqs = newProteinSeqs
 
     return newProteinSeqs
@@ -212,33 +213,41 @@ def main():
     nameOfSeqs = []
     proteinSeqs = []
     readNextLine = False
+    isFasta = False
 
     #Sort through input file
     for eachLine in inputFile:
-        #Save name for the file
-        if readNextLine:
-            #Save dna seq associated with that line and find transversions/transitions
-            proteinSeqs.append(eachLine.strip())
-            readNextLine = False
-        if ">" in eachLine:
-            #Skip the first char and save name to array if the bounds allow it
-            nameOfSeqs.append(eachLine[1 : len(eachLine)].strip())
-            #read the next line and store the DNA sequence
-            readNextLine = True
-
+        if eachLine.startswith(">"):
+            isFasta = True
+        if isFasta:
+            #Save name for the file
+            if readNextLine:
+                #Save dna seq associated with that line and find transversions/transitions
+                proteinSeqs.append(eachLine.strip())
+                readNextLine = False
+            if ">" in eachLine:
+                #Skip the first char and save name to array if the bounds allow it
+                nameOfSeqs.append(eachLine[1 : len(eachLine)].strip())
+                #read the next line and store the DNA sequence
+                readNextLine = True
+        else:
+            if eachLine.strip():
+                proteinSeqs.append(eachLine.strip())
+                
     #Validate protein sequences
-    validProteinSeq = ValidateProteins(proteinSeqs)
+    validProteinSeq = ValidateProteins(proteinSeqs, nameOfSeqs, substitutionMatrix)
     if not validProteinSeq:
-        print("\nA valid protein sequence was not given. Please try again.")
         return
-    
-    print("Here are the protein sequences given: ")
-    print(proteinSeqs)
-    print("Length of sequences: " + str(len(proteinSeqs)))
 
     #re-iterate the steps until all sequences have been included in a single multiple alignment.
-    while len(proteinSeqs) > 1:
+    loopFound = False
+    while len(proteinSeqs) > 1 and not loopFound:
         proteinSeqs = AlignSequences(proteinSeqs)
+        if len(proteinSeqs) > 1 and proteinSeqs[0] == proteinSeqs[1]:
+            loopFound = True
+
+    print("The final alignment is:\n")
+    print(proteinSeqs[0])
 
 #run main function
 main()
