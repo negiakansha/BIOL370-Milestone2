@@ -59,8 +59,12 @@ How to Use:
 3. Output files will be generated, containing the results in both text and CSV formats.
 
 '''
+#Used to take log 
 import math
+#Used to convert output to csv 
 import csv
+#Used to terminate program 
+import sys
 
 #Creating a list for valid amino acid including '-'
 valid_amino_acids = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V', '-']
@@ -97,6 +101,8 @@ def open_file(file_name):
 
     except IOError:
         print("Error: file does not appear to exist")
+        sys.exit()
+
     
     return Family_protein
 
