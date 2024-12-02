@@ -317,7 +317,7 @@ Main function to run the program logic.
 """
 def main():
     #File to read
-    file_name = "sequence2.txt"  
+    file_name = "sequence.txt"  
 
     #Function to open the files and it passes sequence with name
     All_protein_sequence = open_file(file_name)
