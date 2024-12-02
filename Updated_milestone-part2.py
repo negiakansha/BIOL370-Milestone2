@@ -67,7 +67,7 @@ import csv
 import sys
 
 #Creating a list for valid amino acid including '-'
-valid_amino_acids = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V', '-']
+valid_amino_acids = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'X', 'Y', 'V', '-']
 
 """
 Function to open the FASTA format txt file to get the sequence
@@ -125,7 +125,7 @@ def calculate_frequency(sequences):
     counts_for_frequency = {
         'A': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0, 'H': 0,
         'I': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 0, 'P': 0, 'Q': 0, 'R': 0,
-        'S': 0, 'T': 0, 'V': 0, 'W': 0, 'Y': 0, '-': 0 
+        'S': 0, 'T': 0, 'V': 0, 'W': 0, 'X': 0, 'Y': 0, '-': 0 
     }
 
     total_count = 0
@@ -152,7 +152,7 @@ def calculate_frequency(sequences):
 # Function to calculate pairwise frequencies(Helper function for "calculate_amino_pair")
 def calculate_pairwise(counts_for_frequency):
     # List of possible amino acids
-    amino_acids = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y', '-']
+    amino_acids = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', '-']
     
     # Initialize pairwise_frequencies dictionary with all possible pairs set to 0
     pairwise_frequencies = {}
@@ -199,7 +199,7 @@ def calculate_amino_pair(sequences):
         # Counting occurrences of amino acids and pairs at each position
         for i in range(length_of_individual_seq):
             # Initializing counts for this position
-            counts_for_frequency = {aa: 0 for aa in 'ACDEFGHIKLMNPQRSTVWY-'}
+            counts_for_frequency = {aa: 0 for aa in 'ACDEFGHIKLMNPQRSTVWXY-'}
 
             # Counting amino acids at position i
             for sequence in seq_list:
