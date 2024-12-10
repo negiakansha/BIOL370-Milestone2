@@ -24,6 +24,7 @@ def ValidateProteins(proteinSeqs, nameOfSeqs, substitutionMatrix):
 
 
 #This is our team's substitution matrix we are using to determine alignment for protein sequences
+# '-': {'-': 3.4253431744398948, 'A': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0, 'H': 0, 'I': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 0, 'P': 0, 'Q': 0, 'R': 0, 'S': 0, 'T': 0, 'V': 0, 'W': 0, 'X': 0, 'Y': 0},
 substitutionMatrix = {
     '-': {'-': 3.4253431744398948, 'A': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0, 'H': 0, 'I': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 0, 'P': 0, 'Q': 0, 'R': 0, 'S': 0, 'T': 0, 'V': 0, 'W': 0, 'X': 0, 'Y': 0},
     'A': {'-': -2.119818318223286, 'A': 2.1713614795485054, 'C': -0.0130122468148803, 'D': -0.35985306763820957, 'E': -0.1762968101545147, 'F': -1.9633669357201928, 'G': 0.22747035077434463, 'H': -1.8446496107785948, 'I': -1.0001288311236913, 'K': -0.447400767811872, 'L': -1.7582812430898471, 'M': -1.288171341526304, 'N': -0.7618694495981007, 'P': -0.05737699731902333, 'Q': -0.034224209254968795, 'R': -0.5073105470793311, 'S': 0.34311276007850533, 'T': -0.27095814510528177, 'V': -0.30796733770868173, 'W': -2.35552714223542, 'X': -0.6696357326634829, 'Y': -1.9536253448909018},
@@ -49,103 +50,141 @@ substitutionMatrix = {
     'Y': {'-': -1.4892213490540445, 'A': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0, 'H': 0, 'I': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 0, 'P': 0, 'Q': 0, 'R': 0, 'S': 0, 'T': 0, 'V': 0, 'W': 0, 'X': 0, 'Y': 4.442322319141567}
 }
 
+gapPenalty = -2
+
+# BLOSUM62 = {
+#     '-': {'-': 3.4253431744398948, 'A': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0, 'H': 0, 'I': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 0, 'P': 0, 'Q': 0, 'R': 0, 'S': 0, 'T': 0, 'V': 0, 'W': 0, 'X': 0, 'Y': 0},
+#     'A': {'A': 4, 'C': 0, 'D': -2, 'E': -1, 'F': -2, 'G': 0, 'H': -1, 'I': -1, 'K': -1, 'L': -1, 'M': -1, 'N': -2, 'P': -1, 'Q': -1, 'R': -1, 'S': 1, 'T': 0, 'V': 0, 'W': -3, 'Y': -2},
+#     'C': {'A': 0, 'C': 9, 'D': -3, 'E': -4, 'F': -2, 'G': -3, 'H': -3, 'I': -1, 'K': -3, 'L': -1, 'M': -1, 'N': -3, 'P': -2, 'Q': -3, 'R': -3, 'S': -1, 'T': -1, 'V': -1, 'W': -2, 'Y': -2},
+#     'D': {'A': -2, 'C': -3, 'D': 6, 'E': 2, 'F': -3, 'G': -1, 'H': 0, 'I': -3, 'K': -1, 'L': -3, 'M': -2, 'N': 1, 'P': -1, 'Q': 0, 'R': 0, 'S': 0, 'T': -1, 'V': -2, 'W': -4, 'Y': -3},
+#     'E': {'A': -1, 'C': -4, 'D': 2, 'E': 5, 'F': -3, 'G': -2, 'H': 0, 'I': -3, 'K': 1, 'L': -2, 'M': -2, 'N': 0, 'P': -1, 'Q': 2, 'R': 1, 'S': 0, 'T': -1, 'V': -2, 'W': -3, 'Y': -2},
+#     'F': {'A': -2, 'C': -2, 'D': -3, 'E': -3, 'F': 6, 'G': -3, 'H': -1, 'I': 0, 'K': -2, 'L': 0, 'M': 0, 'N': -3, 'P': -2, 'Q': -2, 'R': -2, 'S': -1, 'T': -1, 'V': 0, 'W': 1, 'Y': 3},
+#     'G': {'A': 0, 'C': -3, 'D': -1, 'E': -2, 'F': -3, 'G': 6, 'H': -2, 'I': -4, 'K': -2, 'L': -4, 'M': -3, 'N': -1, 'P': -2, 'Q': -2, 'R': -2, 'S': 0, 'T': -2, 'V': -3, 'W': -2, 'Y': -3},
+#     'H': {'A': -1, 'C': -3, 'D': 0, 'E': 0, 'F': -1, 'G': -2, 'H': 8, 'I': -2, 'K': -1, 'L': -2, 'M': -2, 'N': 1, 'P': -1, 'Q': 0, 'R': 0, 'S': -1, 'T': -2, 'V': -2, 'W': -1, 'Y': 2},
+#     'I': {'A': -1, 'C': -1, 'D': -3, 'E': -3, 'F': 0, 'G': -4, 'H': -2, 'I': 4, 'K': -1, 'L': 2, 'M': 1, 'N': -3, 'P': -2, 'Q': -1, 'R': -1, 'S': -2, 'T': -1, 'V': 3, 'W': -3, 'Y': -1},
+#     'K': {'A': -1, 'C': -3, 'D': -1, 'E': 1, 'F': -2, 'G': -2, 'H': -1, 'I': -1, 'K': 5, 'L': -1, 'M': -1, 'N': 0, 'P': -1, 'Q': 1, 'R': 2, 'S': 0, 'T': -1, 'V': -2, 'W': -3, 'Y': -2},
+#     'L': {'A': -1, 'C': -1, 'D': -3, 'E': -2, 'F': 0, 'G': -4, 'H': -2, 'I': 2, 'K': -1, 'L': 4, 'M': 2, 'N': -3, 'P': -2, 'Q': -1, 'R': -1, 'S': -2, 'T': -1, 'V': 1, 'W': -2, 'Y': -1},
+#     'M': {'A': -1, 'C': -1, 'D': -2, 'E': -2, 'F': 0, 'G': -3, 'H': -2, 'I': 1, 'K': -1, 'L': 2, 'M': 5, 'N': -2, 'P': -2, 'Q': 0, 'R': 0, 'S': -1, 'T': -1, 'V': 1, 'W': -1, 'Y': -1},
+#     'N': {'A': -2, 'C': -3, 'D': 1, 'E': 0, 'F': -3, 'G': -1, 'H': 1, 'I': -3, 'K': 0, 'L': -3, 'M': -2, 'N': 6, 'P': -1, 'Q': 0, 'R': 0, 'S': 0, 'T': -1, 'V': -3, 'W': -4, 'Y': -3},
+#     'P': {'A': -1, 'C': -2, 'D': -1, 'E': -1, 'F': -2, 'G': -2, 'H': -1, 'I': -2, 'K': -1, 'L': -2, 'M': -2, 'N': -1, 'P': 7, 'Q': -1, 'R': -1, 'S': -1, 'T': -1, 'V': -2, 'W': -3, 'Y': -2},
+#     'Q': {'A': -1, 'C': -3, 'D': 0, 'E': 2, 'F': -2, 'G': -2, 'H': 0, 'I': -1, 'K': 1, 'L': -1, 'M': 0, 'N': 0, 'P': -1, 'Q': 5, 'R': 1, 'S': 0, 'T': -1, 'V': -2, 'W': -3, 'Y': -2},
+#     'R': {'A': -1, 'C': -3, 'D': 0, 'E': 1, 'F': -2, 'G': -2, 'H': 0, 'I': -1, 'K': 2, 'L': -1, 'M': 0, 'N': 0, 'P': -1, 'Q': 1, 'R': 5, 'S': 0, 'T': -1, 'V': -2, 'W': -3, 'Y': -2},
+#     'S': {'A': 1, 'C': -1, 'D': 0, 'E': 0, 'F': -1, 'G': 0, 'H': -1, 'I': -2, 'K': 0, 'L': -2, 'M': -1, 'N': 0, 'P': -1, 'Q': 0, 'R': 0, 'S': 4, 'T': 1, 'V': -2, 'W': -3, 'Y': -2},
+#     'T': {'A': 0, 'C': -1, 'D': -1, 'E': -1, 'F': -1, 'G': -2, 'H': -2, 'I': -1, 'K': -1, 'L': -1, 'M': -1, 'N': -1, 'P': -1, 'Q': -1, 'R': -1, 'S': 1, 'T': 5, 'V': 1, 'W': -2, 'Y': -2},
+#     'V': {'A': 0, 'C': -1, 'D': -2, 'E': -2, 'F': 0, 'G': -3, 'H': -2, 'I': 3, 'K': -2, 'L': 1, 'M': 1, 'N': -3, 'P': -2, 'Q': -2, 'R': -2, 'S': -2, 'T': 1, 'V': 4, 'W': -3, 'Y': -1},
+#     'W': {'A': -3, 'C': -2, 'D': -4, 'E': -3, 'F': 1, 'G': -2, 'H': -1, 'I': -3, 'K': -3, 'L': -2, 'M': -1, 'N': -4, 'P': -3, 'Q': -3, 'R': -3, 'S': -3, 'T': -2, 'V': -3, 'W': 11, 'Y': 2},
+#     'Y': {'A': -2, 'C': -2, 'D': -3, 'E': -2, 'F': 3, 'G': -3, 'H': 2, 'I': -1, 'K': -2, 'L': -1, 'M': -1, 'N': -3, 'P': -2, 'Q': -2, 'R': -2, 'S': -2, 'T': -2, 'V': -1, 'W': 2, 'Y': 7}
+# }
+
 def GloballyAlign(protein1, protein2):
     #Initialize matrix based on protein1 length and protein2 length
+    #Make it one longer to include a gap at beginning of sequences in matrix
+    protein1 = "-" + protein1
+    protein2 = "-" + protein2
+    print("proteins are : " + protein1 + " " + protein2)
     matrixWidth = len(protein1)
     matrixHeight = len(protein2)
-    matrix = [[0 for x in range(matrixHeight+1)] for y in range(matrixWidth+1)]
+    matrix = [[0 for x in range(matrixWidth + 1)] for y in range(matrixHeight + 1)]
 
     # Edit cells in first row and column based on gap penalty
-    for i in range(1, matrixWidth + 1):
-        if protein1[i - 1] == 'x':
-            matrix[i][0] = matrix[i - 1][0] + substitutionMatrix['-'].get('-')
+    for i in range(0, matrixWidth):
+        #matrix at [0][0] should be 0
+        if i == 0:
+            matrix[i][0] = 0
         else:
-            matrix[i][0] = matrix[i - 1][0] + substitutionMatrix[protein1[i - 1]].get('-')
+            # matrix[i][0] = matrix[i - 1][0] + substitutionMatrix[protein1[i - 1]].get('-')
+            # there is no gap penalty in our matrix so I will introduce a hard-coded gap penalty
+            matrix[i][0] = matrix[i - 1][0] + gapPenalty
 
-    for j in range(1, matrixHeight + 1):
-        if protein2[j - 1] == 'x':
-            matrix[0][j] = matrix[0][j - 1] + substitutionMatrix['-'].get('-')
+    for j in range(0, matrixHeight):
+        if j == 0:
+            matrix[0][j] = 0
         else:
-            matrix[0][j] = matrix[0][j - 1] + substitutionMatrix[protein2[j - 1]].get('-')
+            matrix[0][j] = matrix[0][j - 1] + gapPenalty
     
     # Edit the rest of the matrix cells
-    for i in range(1, matrixWidth+1):
-        for j in range(1, matrixHeight+1):            
+    for i in range(1, matrixWidth):
+        for j in range(1, matrixHeight):            
             # For each cell (i, j), calculate:
             # (a) Cell (i – 1, j) – Gap penalty
-            if protein1[i - 1] == 'x':
-                a = matrix[i - 1][j] + substitutionMatrix['-'].get('-')
-            else:
-                a = matrix[i - 1][j] + substitutionMatrix[protein1[i - 1]].get('-')
+            a = matrix[i - 1][j] + gapPenalty
             
             # (b) Cell (i, j – 1) – Gap penalty
-            if protein2[j - 1] == 'x':
-                b = matrix[i][j - 1] + substitutionMatrix['-'].get('-')
-            else:
-                b = matrix[i][j - 1] + substitutionMatrix[protein2[j - 1]].get('-')
+            b = matrix[i][j - 1] + gapPenalty
 
             # (c) Cell (i – 1, j – 1) ± Match/mismatch
             # find match or mismatch
-            if protein1[i - 1] == 'x' or protein2[j - 1] == 'x':
-                c = matrix[i - 1][j - 1] + substitutionMatrix['-'].get('-')
+            #if it's an x, add gap penalty
+            if protein1[i] == 'x' or protein2[j] == 'x':
+                c = matrix[i - 1][j - 1] + gapPenalty
             else:
-                matchValue = substitutionMatrix[protein1[i - 1]].get(protein2[j - 1])
-                c = matrix[i - 1][j - 1] + matchValue
+                #match or mismatch
+                c = matrix[i - 1][j - 1] + substitutionMatrix[protein1[i]].get(protein2[j])
 
             # Then fill in the largest of these values
             matrix[i][j] = max(a, b, c)
     
     # backward pass time!!
-    alignedProtein1 = []
-    alignedProtein2 = []
-    
+    # final cell is as long as the shortest protein length
     i = matrixWidth
     j = matrixHeight
+    finalCell = matrix[i - 1][j - 1]
+    print(finalCell)
+
+    optimalPathSeq1 = [protein1[i - 1]] # character in protein 1 (i)
+    optimalPathSeq2 = [protein2[j - 1]] # character in protein 2 (j)
+
+    print("optimal seq 1 = ")
+    print(optimalPathSeq1)
+    print("optimal seq 2 = ")
+    print(optimalPathSeq2)
+
     while i > 0 and j > 0:
-        score = matrix[i][j]
-        score_diag = matrix[i-1][j-1]
-        score_left = matrix[i][j-1]
+        current = matrix[i][j]
+        top = matrix[i][j]
+        left = matrix[i][j-1]
+        diag = matrix[i-1][j-1]
         
         # diagonal
-        if protein1[i-1] == 'x' or protein2[j-1] == 'x':
-            if score == score_diag + substitutionMatrix['-'].get('-'):
-                alignedProtein1.append('-')
-                alignedProtein2.append(protein2[j-1] if protein1[i-1] == 'x' else protein1[i-1])
-                i -= 1
-                j -= 1
-        else:
-            # match or mismatch
-            if score == score_diag + substitutionMatrix[protein1[i-1]].get(protein2[j-1]):
-                alignedProtein1.append(protein1[i-1])
-                alignedProtein2.append(protein2[j-1])
-                i -= 1
-                j -= 1
-            # left backwards
-            elif score == score_left + substitutionMatrix['-'][protein2[j-1]]:
-                alignedProtein1.append('-')
-                alignedProtein2.append(protein2[j-1])
-                j -= 1
-            # up backwards
-            else:
-                alignedProtein1.append(protein1[i-1])
-                alignedProtein2.append('-')
-                i -= 1
+        # if protein1[i-1] == 'x' or protein2[j-1] == 'x':
+        #     if current == score_diag + substitutionMatrix['-'].get('-'):
+        #         alignedProtein1.append('-')
+        #         alignedProtein2.append(protein2[j-1] if protein1[i-1] == 'x' else protein1[i-1])
+        #         i -= 1
+        #         j -= 1
+        # else:
+        #     # match or mismatch
+        #     if score == score_diag + substitutionMatrix[protein1[i-1]].get(protein2[j-1]):
+        #         alignedProtein1.append(protein1[i-1])
+        #         alignedProtein2.append(protein2[j-1])
+        #         i -= 1
+        #         j -= 1
+        #     # left backwards
+        #     elif score == score_left + substitutionMatrix['-'][protein2[j-1]]:
+        #         alignedProtein1.append('-')
+        #         alignedProtein2.append(protein2[j-1])
+        #         j -= 1
+        #     # up backwards
+        #     else:
+        #         alignedProtein1.append(protein1[i-1])
+        #         alignedProtein2.append('-')
+        #         i -= 1
     
-    # remaining sequences
-    while i > 0:
-        alignedProtein1.append(protein1[i-1])
-        alignedProtein2.append('-')
-        i -= 1
+    # # remaining sequences
+    # while i > 0:
+    #     alignedProtein1.append(protein1[i-1])
+    #     alignedProtein2.append('-')
+    #     i -= 1
     
-    while j > 0:
-        alignedProtein1.append('-')
-        alignedProtein2.append(protein2[j-1])
-        j -= 1
+    # while j > 0:
+    #     alignedProtein1.append('-')
+    #     alignedProtein2.append(protein2[j-1])
+    #     j -= 1
     
-    alignedProtein1 = ''.join(reversed(alignedProtein1))
-    alignedProtein2 = ''.join(reversed(alignedProtein2))
+    # alignedProtein1 = ''.join(reversed(alignedProtein1))
+    # alignedProtein2 = ''.join(reversed(alignedProtein2))
     
-    return alignedProtein1, alignedProtein2
+    return optimalPathSeq1, optimalPathSeq2
 
 
 def AlignSequences(proteinSeqs):
@@ -241,10 +280,11 @@ def main():
 
     #re-iterate the steps until all sequences have been included in a single multiple alignment.
     loopFound = False
-    while len(proteinSeqs) > 1 and not loopFound:
-        proteinSeqs = AlignSequences(proteinSeqs)
-        if len(proteinSeqs) > 1 and proteinSeqs[0] == proteinSeqs[1]:
-            loopFound = True
+    # while len(proteinSeqs) > 1 and not loopFound:
+    #     proteinSeqs = AlignSequences(proteinSeqs)
+    #     if len(proteinSeqs) > 1 and proteinSeqs[0] == proteinSeqs[1]:
+    #         loopFound = True
+    proteinSeqs = AlignSequences(proteinSeqs)
 
     print("The final alignment is:\n")
     print(proteinSeqs[0])
