@@ -86,6 +86,9 @@ def GloballyAlign(protein1, protein2):
     matrixHeight = len(protein2)
     matrix = [[0 for x in range(matrixWidth + 1)] for y in range(matrixHeight + 1)]
 
+    optimalPathSeq1 = [] # character in protein 1 (i)
+    optimalPathSeq2 = [] # character in protein 2 (j)
+
     # Edit cells in first row and column based on gap penalty
     for i in range(0, matrixWidth):
         #matrix at [0][0] should be 0
@@ -115,6 +118,7 @@ def GloballyAlign(protein1, protein2):
             # (c) Cell (i – 1, j – 1) ± Match/mismatch
             # find match or mismatch
             #if it's an x, add gap penalty
+            #DIAGONAL
             if protein1[i] == 'x' or protein2[j] == 'x':
                 c = matrix[i - 1][j - 1] + gapPenalty
             else:
@@ -123,66 +127,89 @@ def GloballyAlign(protein1, protein2):
 
             # Then fill in the largest of these values
             matrix[i][j] = max(a, b, c)
-    
+
     # backward pass time!!
     # final cell is as long as the shortest protein length
-    i = matrixWidth
-    j = matrixHeight
-    finalCell = matrix[i - 1][j - 1]
-    print(finalCell)
+    i = matrixWidth - 1
+    j = matrixHeight - 1
+    current = matrix[i][j]
 
-    optimalPathSeq1 = [protein1[i - 1]] # character in protein 1 (i)
-    optimalPathSeq2 = [protein2[j - 1]] # character in protein 2 (j)
-
-    print("optimal seq 1 = ")
-    print(optimalPathSeq1)
-    print("optimal seq 2 = ")
-    print(optimalPathSeq2)
+    optimalPathSeq1 = [protein1[i]] # character in protein 1 (i)
+    optimalPathSeq2 = [protein2[j]] # character in protein 2 (j)
 
     while i > 0 and j > 0:
-        current = matrix[i][j]
-        top = matrix[i][j]
-        left = matrix[i][j-1]
+        top = matrix[i][j-1]
+        left = matrix[i-1][j]
         diag = matrix[i-1][j-1]
         
-        # diagonal
-        # if protein1[i-1] == 'x' or protein2[j-1] == 'x':
-        #     if current == score_diag + substitutionMatrix['-'].get('-'):
-        #         alignedProtein1.append('-')
-        #         alignedProtein2.append(protein2[j-1] if protein1[i-1] == 'x' else protein1[i-1])
-        #         i -= 1
-        #         j -= 1
-        # else:
-        #     # match or mismatch
-        #     if score == score_diag + substitutionMatrix[protein1[i-1]].get(protein2[j-1]):
-        #         alignedProtein1.append(protein1[i-1])
-        #         alignedProtein2.append(protein2[j-1])
-        #         i -= 1
-        #         j -= 1
-        #     # left backwards
-        #     elif score == score_left + substitutionMatrix['-'][protein2[j-1]]:
-        #         alignedProtein1.append('-')
-        #         alignedProtein2.append(protein2[j-1])
-        #         j -= 1
-        #     # up backwards
-        #     else:
-        #         alignedProtein1.append(protein1[i-1])
-        #         alignedProtein2.append('-')
-        #         i -= 1
+        # chose best optimal path
+        isDiag = False
+        isLeft = False
+        isTop = False
+        #diagonal
+        #deal with x or gaps first
+        if (protein1[i] == 'x' or protein2[j] == 'x'):
+            if(protein1[i] == 'x'):
+                #add gap on left
+                isTop = True
+            else:
+                isLeft = True
+        #check if diagonal leads to current cell
+        elif (diag + substitutionMatrix[protein1[i]].get(protein2[j]) == current):
+            # possiblePaths.append((protein1[i], protein2[j]))
+            isDiag = True
+        #now check left
+        elif (left + gapPenalty):
+            isLeft = True
+        #check top
+        elif (top + gapPenalty):
+            isTop = True
+        
+        #if diagonal, take the diagonal path
+        if isDiag:
+            optimalPathSeq1.append(protein1[i-1])
+            optimalPathSeq2.append(protein2[j-1])
+            current = matrix[i-1][j-1]
+        #else if left, take the left path
+        elif isLeft:
+            optimalPathSeq1.append(protein1[i-1])
+            optimalPathSeq2.append(protein2[j])
+            current = matrix[i-1][j]
+        #else if top, take the top path
+        elif isTop:
+            optimalPathSeq1.append(protein1[i])
+            optimalPathSeq2.append(protein2[j-1])
+            current = matrix[i-1][j-1]
+        
+        i -= 1
+        j -= 1
+
+        print("optimal seq 1 = ")
+        print(optimalPathSeq1)
+        print("optimal seq 2 = ")
+        print(optimalPathSeq2)
+
+    # add gaps for rest of sequence
+    while i > 0:
+        optimalPathSeq1.append(protein1[i-1])
+        optimalPathSeq2.append('-')
+        i -= 1
     
-    # # remaining sequences
-    # while i > 0:
-    #     alignedProtein1.append(protein1[i-1])
-    #     alignedProtein2.append('-')
-    #     i -= 1
+    while j > 0:
+        optimalPathSeq1.append('-')
+        optimalPathSeq2.append(protein2[j-1])
+        j -= 1
+
+    #remove gaps at front
+    while optimalPathSeq1[len(optimalPathSeq1) - 1] == '-' and optimalPathSeq2[len(optimalPathSeq2) - 1] == '-':
+        optimalPathSeq1.pop()
+        optimalPathSeq2.pop()
     
-    # while j > 0:
-    #     alignedProtein1.append('-')
-    #     alignedProtein2.append(protein2[j-1])
-    #     j -= 1
-    
-    # alignedProtein1 = ''.join(reversed(alignedProtein1))
-    # alignedProtein2 = ''.join(reversed(alignedProtein2))
+    optimalPathSeq1 = ''.join(reversed(optimalPathSeq1))
+    optimalPathSeq2 = ''.join(reversed(optimalPathSeq2))
+
+    print("optimal path 1 ", optimalPathSeq1)
+    print("optimal path 2 ", optimalPathSeq2)
     
     return optimalPathSeq1, optimalPathSeq2
 
@@ -280,11 +307,11 @@ def main():
 
     #re-iterate the steps until all sequences have been included in a single multiple alignment.
     loopFound = False
-    # while len(proteinSeqs) > 1 and not loopFound:
-    #     proteinSeqs = AlignSequences(proteinSeqs)
-    #     if len(proteinSeqs) > 1 and proteinSeqs[0] == proteinSeqs[1]:
-    #         loopFound = True
-    proteinSeqs = AlignSequences(proteinSeqs)
+    while len(proteinSeqs) > 1 and not loopFound:
+        proteinSeqs = AlignSequences(proteinSeqs)
+        if len(proteinSeqs) > 1 and proteinSeqs[0] == proteinSeqs[1]:
+            loopFound = True
+    # proteinSeqs = AlignSequences(proteinSeqs)
 
     print("The final alignment is:\n")
     print(proteinSeqs[0])
