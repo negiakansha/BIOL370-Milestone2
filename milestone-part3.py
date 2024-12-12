@@ -81,7 +81,6 @@ def GloballyAlign(protein1, protein2):
     #Make it one longer to include a gap at beginning of sequences in matrix
     protein1 = "-" + protein1
     protein2 = "-" + protein2
-    print("proteins are : " + protein1 + " " + protein2)
     matrixWidth = len(protein1)
     matrixHeight = len(protein2)
     matrix = [[0 for x in range(matrixWidth + 1)] for y in range(matrixHeight + 1)]
@@ -184,11 +183,6 @@ def GloballyAlign(protein1, protein2):
         i -= 1
         j -= 1
 
-        print("optimal seq 1 = ")
-        print(optimalPathSeq1)
-        print("optimal seq 2 = ")
-        print(optimalPathSeq2)
-
     # add gaps for rest of sequence
     while i > 0:
         optimalPathSeq1.append(protein1[i-1])
@@ -207,9 +201,6 @@ def GloballyAlign(protein1, protein2):
     
     optimalPathSeq1 = ''.join(reversed(optimalPathSeq1))
     optimalPathSeq2 = ''.join(reversed(optimalPathSeq2))
-
-    print("optimal path 1 ", optimalPathSeq1)
-    print("optimal path 2 ", optimalPathSeq2)
     
     return optimalPathSeq1, optimalPathSeq2
 
@@ -243,7 +234,7 @@ def AlignSequences(proteinSeqs):
 
     # globally align those two sequences using your team’s substitution matrix
     aligned1, aligned2 = GloballyAlign(protein1, protein2)
-    finalAligned = AlignTwoSequencesIntoOne(aligned1, aligned2)
+    finalAligned = AlignTwoSequencesIntoOne(aligned1, aligned2, proteinSeqs)
 
     # Replace the two protein sequences with their alignment in the original set of sequences
     newProteinSeqs = []
@@ -259,15 +250,25 @@ def AlignSequences(proteinSeqs):
 
     return newProteinSeqs
 
-def AlignTwoSequencesIntoOne(protein1, protein2):
+def AlignTwoSequencesIntoOne(protein1, protein2, proteinSeqs):
     aligned = ""
 
     # check for matching sequence in proteins, otherwise replace with x
-    for seq1, seq2 in zip(protein1, protein2):
-        if seq1 == seq2:
-            aligned += seq1
+    shortestProtein = protein2
+    if protein1 >= protein2:
+        shortestProtein = protein1
+    for i, aa in enumerate(shortestProtein):
+        if protein1[i] == protein2[i]:
+            aligned += aa
         else:
-            aligned += "x"
+            aminoAcidsPresent = {}
+            for sequence in proteinSeqs:
+                for aa2 in sequence:
+                    if aa2 in aminoAcidsPresent:
+                        aminoAcidsPresent[aa2] += 1
+                    else:
+                        aminoAcidsPresent[aa2] = 1
+            aligned += max(aminoAcidsPresent, key = aminoAcidsPresent.get)
 
     return aligned
 
@@ -311,10 +312,9 @@ def main():
         proteinSeqs = AlignSequences(proteinSeqs)
         if len(proteinSeqs) > 1 and proteinSeqs[0] == proteinSeqs[1]:
             loopFound = True
-    # proteinSeqs = AlignSequences(proteinSeqs)
 
-    print("The final alignment is:\n")
-    print(proteinSeqs[0])
+    print("The final alignment is:")
+    print(proteinSeqs[0] + "\n")
 
 #run main function
 main()
