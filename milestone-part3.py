@@ -83,7 +83,7 @@ def GloballyAlign(protein1, protein2):
     protein2 = "-" + protein2
     matrixWidth = len(protein1)
     matrixHeight = len(protein2)
-    matrix = [[0 for x in range(matrixWidth + 1)] for y in range(matrixHeight + 1)]
+    matrix = [[0 for x in range(matrixHeight + 1)] for y in range(matrixWidth + 1)]
 
     optimalPathSeq1 = [] # character in protein 1 (i)
     optimalPathSeq2 = [] # character in protein 2 (j)
@@ -253,24 +253,26 @@ def AlignSequences(proteinSeqs):
 def AlignTwoSequencesIntoOne(protein1, protein2, proteinSeqs):
     aligned = ""
 
-    # check for matching sequence in proteins, otherwise replace with x
     shortestProtein = protein2
     if protein1 >= protein2:
         shortestProtein = protein1
+
     for i, aa in enumerate(shortestProtein):
         if protein1[i] == protein2[i]:
-            aligned += aa
+            aligned += aa 
         else:
             aminoAcidsPresent = {}
             for sequence in proteinSeqs:
-                for aa2 in sequence:
-                    if aa2 in aminoAcidsPresent:
-                        aminoAcidsPresent[aa2] += 1
+                if i < len(sequence):
+                    aa = sequence[i]
+                    if aa in aminoAcidsPresent:
+                        aminoAcidsPresent[aa] += 1
                     else:
-                        aminoAcidsPresent[aa2] = 1
-            aligned += max(aminoAcidsPresent, key = aminoAcidsPresent.get)
+                        aminoAcidsPresent[aa] = 1
+            aligned += max(aminoAcidsPresent, key=aminoAcidsPresent.get)
 
     return aligned
+
 
 def main():
     #Read input of FASTA formatted protein sequences
