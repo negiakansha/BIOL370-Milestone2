@@ -274,7 +274,7 @@ def AlignTwoSequencesIntoOne(protein1, protein2, proteinSeqs):
 
 def main():
     #Read input of FASTA formatted protein sequences
-    inputFile = open("alignment.txt", "r").readlines()
+    inputFile = open("ABHD2.txt", "r").readlines()
 
     #Store the protein sequences along with the names of those sequences
     nameOfSeqs = []

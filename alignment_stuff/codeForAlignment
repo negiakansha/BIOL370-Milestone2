@@ -1,0 +1,25 @@
+input_file = "input.txt"  # Replace with your input file name
+output_file = "output.fasta"  # Replace with your desired output file name
+
+# Dictionary to store sequences by identifier
+sequences = {}
+
+# Read the input file and process each line
+with open(input_file, "r") as file:
+    for line in file:
+        # Skip empty lines
+        if line.strip():
+            parts = line.strip().split(maxsplit=1)
+            if len(parts) == 2:
+                identifier, sequence = parts
+                if identifier not in sequences:
+                    sequences[identifier] = []
+                sequences[identifier].append(sequence)
+
+# Write to the output file in FASTA format
+with open(output_file, "w") as file:
+    for identifier, seq_list in sequences.items():
+        file.write(f">{identifier}\n")
+        file.write(f"{''.join(seq_list)}\n")
+
+print(f"FASTA file has been written to {output_file}")
