@@ -269,14 +269,18 @@ def AlignTwoSequencesIntoOne(protein1, protein2, proteinSeqs):
                         aminoAcidsPresent[aa] += 1
                     else:
                         aminoAcidsPresent[aa] = 1
-            aligned += max(aminoAcidsPresent, key=aminoAcidsPresent.get)
+            if aminoAcidsPresent:
+                highestAACount = max(aminoAcidsPresent, key=aminoAcidsPresent.get)
+            else:
+                highestAACount = "-"
+            aligned += highestAACount
 
     return aligned
 
 
 def main():
     #Read input of FASTA formatted protein sequences
-    inputFile = open("ABHD2.txt", "r").readlines()
+    inputFile = open("ABHD12.txt", "r").readlines()
 
     #Store the protein sequences along with the names of those sequences
     nameOfSeqs = []
